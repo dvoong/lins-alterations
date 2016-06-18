@@ -5,7 +5,6 @@ stop on shutdown
 
 respawn
 
-setuid opentrv
 chdir {{ host_dest }}
 
 exec {{ venv }}/bin/gunicorn --bind unix:/tmp/lins_alterations.socket lins_alterations.wsgi:application
