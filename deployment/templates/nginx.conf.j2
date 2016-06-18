@@ -1,0 +1,15 @@
+server {
+    listen 80;
+    server_name 127.0.0.1;
+
+    location / {
+        proxy_set_header Host $http_host;
+        proxy_pass http://unix:/tmp/lins_alterations.socket;
+    }
+
+    location /static {
+        alias {{ host_dest }}/staticfiles;
+    }
+
+    chunked_transfer_encoding off;
+}

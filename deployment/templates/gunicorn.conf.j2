@@ -1,0 +1,11 @@
+description "Gunicorn server for lins-alterations"
+
+start on net-device-up
+stop on shutdown
+
+respawn
+
+setuid opentrv
+chdir {{ host_dest }}
+
+exec {{ venv }}/bin/gunicorn --bind unix:/tmp/lins_alterations.socket website.wsgi:application
