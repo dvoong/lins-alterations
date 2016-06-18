@@ -57,4 +57,4 @@
       service: name=nginx state=restarted
       
     - name: restart gunicorn
-      service: name=opentrv_gunicorn state=restarted
+      service: name=lins_alterations_gunicorn state=restarted
