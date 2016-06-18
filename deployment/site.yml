@@ -1,0 +1,57 @@
+---
+# file: site.yml
+- name: main playbook
+  hosts: www.lins-alterations.co.uk
+  vars:
+    repo: https://github.com/dvoong/lins-alterations
+    host_dest: /var/www/lins-alterations.co.uk
+    venv: "{{ host_dest }}/virtualenv"
+  tasks:
+    - name: install apt-get packages
+      apt: pkg="{{ item }}" update_cache=yes cache_valid_time=3600
+      become: yes
+      with_items:
+        - git
+        - nginx
+
+    - name: check out the repository on the host
+      git: repo="{{ repo }}" dest="{{ host_dest }}"
+      notify: restart gunicorn
+
+    - name: install required python packages
+      pip: requirements="{{ host_dest }}/requirements.txt" virtualenv="{{ venv }}"
+      
+    - name: sync the database, apply migrations, collect static content
+      django_manage:
+        command: "{{ item }}"
+        app_path: "{{ host_dest }}"
+        virtualenv: "{{ venv }}"
+        with_items:
+          - migrate
+          - collectstatic
+            
+    - name: setup gunicorn configuration
+      template: src=templates/gunicorn.conf.j2 dest=/etc/init/lins_alterations_gunicorn.conf
+      notify: restart gunicorn
+
+    - name: set the nginx config file
+      template: src=templates/nginx.conf.j2 dest=/etc/nginx/sites-available/lins_alterations
+      notify: restart nginx
+    
+    - name: enable lins_alterations in nginx
+      file:
+        dest: /etc/nginx/sites-enabled/lins_alterations
+        src: /etc/nginx/sites-available/lins_alterations
+        state: link
+      notify: restart nginx
+        
+    - name: delete nginx default config file
+      file: path=/etc/nginx/sites-enabled/default state=absent
+      notify: restart nginx
+
+  handlers:
+    - name: restart nginx
+      service: name=nginx state=restarted
+      
+    - name: restart gunicorn
+      service: name=opentrv_gunicorn state=restarted
