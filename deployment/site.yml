@@ -13,7 +13,10 @@
       with_items:
         - git
         - nginx
-
+        - python-dev
+        - libffi-dev
+        - libpq-dev
+        
     - name: check out the repository on the host
       git: repo="{{ repo }}" dest="{{ host_dest }}"
       notify: restart gunicorn
@@ -26,9 +29,9 @@
         command: "{{ item }}"
         app_path: "{{ host_dest }}"
         virtualenv: "{{ venv }}"
-        with_items:
-          - migrate
-          - collectstatic
+      with_items:
+        - migrate
+        - collectstatic
             
     - name: setup gunicorn configuration
       template: src=templates/gunicorn.conf.j2 dest=/etc/init/lins_alterations_gunicorn.conf
