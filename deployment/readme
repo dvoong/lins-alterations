@@ -1,0 +1,4 @@
+# Deployment
+
+## Example
+`ansible-playbook site.yml -K`

@@ -7,6 +7,7 @@
     host_dest: /var/www/lins-alterations.co.uk
     venv: "{{ host_dest }}/virtualenv"
   tasks:
+
     - name: install apt-get packages
       apt: pkg="{{ item }}" update_cache=yes cache_valid_time=3600
       become: yes
@@ -20,6 +21,7 @@
     - name: check out the repository on the host
       git: repo="{{ repo }}" dest="{{ host_dest }}"
       notify: restart gunicorn
+      become: yes
 
     - name: install required python packages
       pip: requirements="{{ host_dest }}/requirements.txt" virtualenv="{{ venv }}"
@@ -58,3 +60,4 @@
       
     - name: restart gunicorn
       service: name=lins_alterations_gunicorn state=restarted
+      become: yes
