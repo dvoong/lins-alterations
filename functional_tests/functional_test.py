@@ -1,5 +1,5 @@
 from selenium import webdriver
-from django.test import 
+from django.test import TestCase
 
 class FunctionalTest(TestCase):
 
@@ -8,9 +8,3 @@ class FunctionalTest(TestCase):
 
     def tearDown(self):
         self.browser.quit()
-
-    def test(self):
-
-        # load homepage
-        self.browser.get(self.server)
-        assert False, 'TODO'
